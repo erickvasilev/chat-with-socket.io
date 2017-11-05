@@ -1,96 +1,82 @@
 const mongo = require('mongodb').MongoClient;
 
 var app = require('express')();
+var express = require('express');
 var server = require('http').Server(app);
 var client = require('socket.io')(server);
 
 server.listen(4000);
 
-var multer  = require('multer');
+var multer = require('multer');
 var path = require('path');
 
 
-app.get('/', function (req,res) {
-res.send('MEAN Stack by Erick');
+app.get('/', function(req, res) {
+    res.send('MEAN Stack by Erick');
 });
 
+app.use('/static', express.static('uploads'));
 
-mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db){
-    if(err){
+var storage = multer.diskStorage({
+	destination: function(req, file, callback) {
+		callback(null, 'uploads')
+	},
+	filename: function(req, file, callback) {
+		callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+	}
+})
+
+app.post('/upload', function(req, res) {
+	var upload = multer({
+		storage: storage,
+		fileFilter: function(req, file, callback) {
+			var ext = path.extname(file.originalname)
+			if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+				return callback(res.end('Only images are allowed'), null)
+			}
+			callback(null, true)
+		}
+	}).single('photo');
+	upload(req, res, function(err) {
+		
+		res.end('File is uploaded');
+	})
+})
+
+
+mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
+    if (err) {
         throw err;
     }
     console.log('MongoDB connected...');
 
-app.get('/database', function (req, res) {
-    if (err) {
-       res.send('Sorry unable to connect to MongoDB Error:', err);
-    } else {
-        var collection = db.collection('chats');
+    app.get('/database', function(req, res) {
+        if (err) {
+            res.send('Sorry unable to connect to MongoDB Error:', err);
+        } else {
+            var collection = db.collection('chats');
 
-        collection.find({}).toArray(function(err, listchat) {
-            res.send(JSON.stringify(listchat, null, 2));
-        });
-    }
-       
-});
+            collection.find({}).toArray(function(err, listchat) {
+                res.send(JSON.stringify(listchat, null, 2));
+            });
+        }
 
-var storage = multer.diskStorage({
-  destination: function (request, file, callback) {
-    callback(null, 'uploads');
-  },
-  filename: function (request, file, callback) {
-    console.log(file);
-    callback(null, file.originalname)
-  }
-});
-var upload = multer({storage: storage}).single('photo');
-app.post('/upload', function(request, response) {
-  upload(request, response, function(err) {
-  if(err) {
-    console.log('Error Occured');
-    return;
-  }
-  console.log(request.file);
-       // Handle sendimage events
-        socket.on('sendimage', function(data){
-            let type = 'image';
-            let name = data.name;
-            let text = 'null';
-            let image = request.file.originalname;
-            let quick_replies = 'null';
+    });
 
-            // Check for name and message
-            if(name == '' || image == ''){
-                // Send error status
-                sendStatus('something wrong');
-            } else {
-                // Insert message
-                chat.insert({type: type, name: name, text: text, image: image, quick_replies: quick_replies}, function(){
-                    client.emit('output', [data]);
-
-                    // Send status object
-                    sendStatus({
-                        message: 'Message sent',
-                        clear: true
-                    });
-                });
-            }
-        });
-
-  })
-});
-
-   client.on('connection', function(socket){
+	
+	client.on('connection', function(socket) {
         let chat = db.collection('chats');
 
-        
-        sendStatus = function(s){
+
+        sendStatus = function(s) {
             socket.emit('status', s);
         }
 
 
-        chat.find().limit(100).sort({_id:1}).toArray(function(err, res){
-            if(err){
+        chat.find().limit(100).sort({
+            _id: 1
+        }).toArray(function(err, res) {
+            if (err) {
                 throw err;
             }
 
@@ -99,7 +85,7 @@ app.post('/upload', function(request, response) {
         });
 
         // Handle input events
-        socket.on('input', function(data){
+        socket.on('input', function(data) {
             let type = 'text';
             let name = data.name;
             let text = data.text;
@@ -107,12 +93,18 @@ app.post('/upload', function(request, response) {
             let quick_replies = 'null';
 
             // Check for name and message
-            if(name == '' || text == ''){
+            if (name == '' || text == '') {
                 // Send error status
                 sendStatus('Please enter a name and message');
             } else {
                 // Insert message
-                chat.insert({type: type, name: name, text: text, image: image, quick_replies: quick_replies}, function(){
+                chat.insert({
+                    type: type,
+                    name: name,
+                    text: text,
+                    image: image,
+                    quick_replies: quick_replies
+                }, function() {
                     client.emit('output', [data]);
 
                     // Send status object
@@ -125,18 +117,25 @@ app.post('/upload', function(request, response) {
         });
 
         // Handle clear
-        socket.on('clear', function(data){
+        socket.on('clear', function(data) {
             // Remove all chats from collection
-            chat.remove({}, function(){
+            chat.remove({}, function() {
                 // Emit cleared
                 socket.emit('cleared');
             });
         });
+		
+		
+	
+        
+			
 
-   });
+            
+        
+
+    });
 
 
-   
+
 
 });
-
