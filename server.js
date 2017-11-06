@@ -75,8 +75,8 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
             let type = 'text';
             let name = data.name;
             let text = data.text;
-            let image = 'null';
-            let quick_replies = 'null';
+            let quick_replies = []
+    
 
             // Check for name and message
             if (name == '' || text == '') {
@@ -88,7 +88,6 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
                     type: type,
                     name: name,
                     text: text,
-                    image: image,
                     quick_replies: quick_replies
                 }, function() {
                     client.emit('output', [data]);
@@ -128,24 +127,28 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
 					
 										let type = 'image';
 										let name = req.body.username[0];
-										let text = 'null';
-										let image = filename;
-										let quick_replies = 'null';
+									
+										let attachment = {
+"type":"image",
+"payload": {
+"url": filename
+}
+};
+										let quick_replies =[]
 
 										// Check for name and message
-										if (name == '' || image == '') {
+										if (name == '' || attachment == '') {
 											// Send error status
-											sendStatus('Please enter a name and message');
+											sendStatus('Please specify name and attachement');
 										} else {
 											// Insert message
 											chat.insert({
 												type: type,
 												name: name,
-												text: text,
-												image: image,
+												attachment: attachment,
 												quick_replies: quick_replies
 											}, function() {
-												client.emit('output', [{ type:type, name: name, image: image }]);
+												client.emit('output', [{ type:type, name: name, attachment: attachment }]);
 
 												// Send status object
 												sendStatus({
