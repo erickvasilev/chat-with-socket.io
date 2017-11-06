@@ -23,7 +23,7 @@ app.get('/', function(req, res) {
 });
 
 app.use('/static', express.static('uploads'));
-
+app.use('/view', express.static('view'));
 
 
 
