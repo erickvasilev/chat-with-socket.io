@@ -11,6 +11,12 @@ server.listen(4000);
 var multer = require('multer');
 var path = require('path');
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 
 app.get('/', function(req, res) {
     res.send('MEAN Stack by Erick');
@@ -110,7 +116,7 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
 			storage: multer.memoryStorage()
 		}).single('photo')
 		upload(req, res, function(err) {
-			var buffer = req.file.buffer
+			var buffer = req.file.buffer;
 			var filename = req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
 			fs.writeFile('uploads/' + filename, buffer, 'binary', function(err) {
 					if (err) throw err
@@ -121,7 +127,7 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
 					 });
 					
 										let type = 'image';
-										let name = req.body.username;
+										let name = req.body.username[0];
 										let text = 'null';
 										let image = filename;
 										let quick_replies = 'null';
@@ -139,7 +145,7 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
 												image: image,
 												quick_replies: quick_replies
 											}, function() {
-												client.emit('output', 'empty');
+												client.emit('output', [{ type:type, name: name, image: image }]);
 
 												// Send status object
 												sendStatus({

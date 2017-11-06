@@ -34,19 +34,28 @@
             <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
 			
             <form ng-submit="send()" class="chat-input" >
-			    <img 
-src="https://openclipart.org/image/300px/svg_to_png/227925/Paperclip-Icon.png&disposition=attachment" id="quickreply"/>
+			    
+				
+				
+				
+				
                 <input id="textarea" type="text" ng-model="textbox" autofocus>
-			
                 <input type="submit" class="send-icon" value=" ">
                 <input type="submit" id="sendButton" value=" "
                     class="sent-indicator {{ status }}">
             </form>
 			<form id="imagetyp" method="post" action="http://23.92.53.187:4000/upload" 
 enctype="multipart/form-data">
-				<input type="file" name="photo" />
+				<!-- <input type="file" name="photo" /> -->
+				<div class="image-upload">
+					<label for="file-input">
+						<img id="quickreply" 
+src="https://openclipart.org/image/300px/svg_to_png/227925/Paperclip-Icon.png&disposition=attachment"/>
+					</label>
+					<input id="file-input" type="file" name="photo"/>
+				</div>
 				<input type="hidden" id="sillynm" name="username" />
-				<input type="submit" value="Send Image">
+				<!-- <input type="submit" value="Send Image"> -->
 			</form>
         </div>
     </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> <script> (function(){
@@ -85,7 +94,7 @@ enctype="multipart/form-data">
                 console.log('Connected to socket...');
                 // Handle Output
                 socket.on('output', function(data){
-                    //console.log(data);
+                    console.log(data);
                     if(data.length){
                         for(var x = 0;x < data.length;x++){
 						    //find-whois
@@ -169,22 +178,21 @@ class="username">'+data[x].name+':</span>&nbsp;'+displaytext+'</div>';
 				});
 				
 				//image type
+				document.getElementById("file-input").onchange = function() {
 				
-                   $('#imagetyp').submit(function(e){
-						 e.preventDefault();
+				       var sillyn = $('#sillynm').val();
 						 
-						 var sillyn = $('#sillynm').val();
-						 
-						 $(this).ajaxSubmit({
+						 $('#imagetyp').ajaxSubmit({
 						   data: {username: sillyn},
 						   contentType: 'application/json',
 						   success: function(response){
-							  console.log('image uploaded and form submitted');
-                              socket.emit('clear');
+							    console.log ('ok');
+                                							
 						   }
 					   });
-						 return false;
-					});
+                };
+				
+                		
 				
                 
                 // Handle Chat Clear
