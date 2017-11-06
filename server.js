@@ -19,20 +19,7 @@ app.get('/', function(req, res) {
 app.use('/static', express.static('uploads'));
 
 
-app.post('/upload', function(req, res) {
-    var upload = multer({
-        storage: multer.memoryStorage()
-    }).single('photo')
-    upload(req, res, function(err) {
-        var buffer = req.file.buffer
-        var filename = req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
-		fs.writeFile('uploads/' + filename, buffer, 'binary', function(err) {
-                if (err) throw err
-                res.end(filename + 'File is uploaded')
-            });
-        
-    })
-})
+
 
 
 mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
@@ -53,6 +40,8 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
         }
 
     });
+	
+	
 
 	
 	client.on('connection', function(socket) {
@@ -115,6 +104,58 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
                 socket.emit('cleared');
             });
         });
+		
+		app.post('/upload', function(req, res) {
+		var upload = multer({
+			storage: multer.memoryStorage()
+		}).single('photo')
+		upload(req, res, function(err) {
+			var buffer = req.file.buffer
+			var filename = req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
+			fs.writeFile('uploads/' + filename, buffer, 'binary', function(err) {
+					if (err) throw err
+					//res.end(filename + 'File is uploaded');
+					res.json({
+						message: 'file uploaded',
+						filename: filename
+					 });
+					
+										let type = 'image';
+										let name = req.body.username;
+										let text = 'null';
+										let image = filename;
+										let quick_replies = 'null';
+
+										// Check for name and message
+										if (name == '' || image == '') {
+											// Send error status
+											sendStatus('Please enter a name and message');
+										} else {
+											// Insert message
+											chat.insert({
+												type: type,
+												name: name,
+												text: text,
+												image: image,
+												quick_replies: quick_replies
+											}, function() {
+												client.emit('output', 'empty');
+
+												// Send status object
+												sendStatus({
+													message: 'Message sent',
+													clear: true
+												});
+											});
+										}				       
+					
+					
+					
+				});
+			
+			});
+					
+		});
 		
 		
 	
