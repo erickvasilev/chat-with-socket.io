@@ -2,6 +2,7 @@ const mongo = require('mongodb').MongoClient;
 
 var app = require('express')();
 var express = require('express');
+var fs = require('fs');
 var server = require('http').Server(app);
 var client = require('socket.io')(server);
 
@@ -17,30 +18,20 @@ app.get('/', function(req, res) {
 
 app.use('/static', express.static('uploads'));
 
-var storage = multer.diskStorage({
-	destination: function(req, file, callback) {
-		callback(null, 'uploads')
-	},
-	filename: function(req, file, callback) {
-		callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-	}
-})
 
 app.post('/upload', function(req, res) {
-	var upload = multer({
-		storage: storage,
-		fileFilter: function(req, file, callback) {
-			var ext = path.extname(file.originalname)
-			if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
-				return callback(res.end('Only images are allowed'), null)
-			}
-			callback(null, true)
-		}
-	}).single('photo');
-	upload(req, res, function(err) {
-		
-		res.end('File is uploaded');
-	})
+    var upload = multer({
+        storage: multer.memoryStorage()
+    }).single('photo')
+    upload(req, res, function(err) {
+        var buffer = req.file.buffer
+        var filename = req.file.fieldname + '-' + Date.now() + path.extname(req.file.originalname);
+		fs.writeFile('uploads/' + filename, buffer, 'binary', function(err) {
+                if (err) throw err
+                res.end(filename + 'File is uploaded')
+            });
+        
+    })
 })
 
 
