@@ -75,7 +75,7 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
             let type = 'text';
             let name = data.name;
             let text = data.text;
-            let quick_replies = []
+            let quick_replies = data.quick_replies;
     
 
             // Check for name and message
@@ -134,7 +134,7 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
 "url": filename
 }
 };
-										let quick_replies =[]
+										let quick_replies = req.body.quickreplies;
 
 										// Check for name and message
 										if (name == '' || attachment == '') {

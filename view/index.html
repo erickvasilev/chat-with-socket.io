@@ -5,7 +5,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <link rel="stylesheet" href="style.css">
     <link rel="apple-touch-icon-precomposed" href="/media/angularjs-png">
     <link rel="shortcut icon" href="/media/angularjs-png">
@@ -13,8 +12,8 @@
     <title>Chat Test</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-    
-    <script src="bower_components/angular/angular.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.js"></script>
     <script src="names.js"></script>
 
 </head>
@@ -27,48 +26,66 @@
             <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
             <div class="chat-messages">
                 <div class="chat-header">
-                   
+
                    Vouch Technical Test<br/> <span id="whois" style="font-size: 13px;"></span>
 				   <button id="clear" class="btn btn-danger">Clear Message</button>
                 </div>
-				
+
 				<div id="status" style="display:none;"></div>
 				<div id="messages">
-                
+
 				</div>
             </div>
 
             <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
             <!-- User Input -->
             <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
-			
+
             <form ng-submit="send()" class="chat-input" >
-			    
-				
-				
-				
-				
-                <input id="textarea"  type="text" ng-model="textbox" autofocus>				
+
+                <input id="textarea"  type="text" ng-model="textbox" autofocus>
                 <input type="submit" class="send-icon" value=" ">
                 <input type="submit" id="sendButton" value=" "
                     class="sent-indicator {{ status }}">
             </form>
 			<form  id="imagetyp" method="post" action="http://23.92.53.187:4000/upload" enctype="multipart/form-data">
-				<!-- <input type="file" name="photo" /> -->
-				<div class="image-upload">
-					<label for="file-input">
-						<img id="quickreply" src="https://openclipart.org/image/300px/svg_to_png/227925/Paperclip-Icon.png&disposition=attachment"/>
-					</label>
 
-					<input id="file-input" type="file" name="photo"/>
+				<!-- <input type="file" name="photo" /> -->
+				<div class="image-upload chat_fs" style="    position: absolute;bottom: 3px;right: 57px;">
+
+					<label for="file-input" class="ring">
+						<img id="sendimg" src="http://icons.iconarchive.com/icons/designbolts/free-multimedia/1024/Photo-icon.png" />
+					</label>
+            <input id="file-input" type="file" name="photo"/>
+
+                    <div id="btnpopup_chat" class="ring">
+                        <img id="quickreply" src="https://cdn.iconscout.com/public/images/icon/free/png-512/flash-dc-superhero-fastest-man-hero-justice-league-earth-saver-38c848c7bb037455-512x512.png" />
+                    </div>
+
+
 				</div>
+                <!-- pop up -->
+                <div class="popup_chat">
+                    <div class="overlay"></div>
+                    <div class="content">
+                        <ul role="menu" class="list_menu_chat">
+                            <li><a href="#" id="askuser"><img id="shirtcon" src="http://www.iconarchive.com/download/i99513/webalys/kameleon.pics/T-Shirt-2.ico" ><br/><small>Trigger Quick Reply</small></a></li>
+                            <!-- <li><a href="#"><span></span> Photo</a></li>
+                            <li><a href="#"><span></span> Video</a></li>
+                            <li><a href="#"><span></span> Audio</a></li>
+                            <li><a href="#"><span></span> Location</a></li>
+                            <li><a href="#"><span></span> Contact</a></li> -->
+                        </ul>
+                    </div>
+                 </div>
+                <!-- end -->
 				<input type="hidden" id="sillynm" name="username" />
 				<!-- <input type="submit" value="Send Image"> -->
 			</form>
 
         </div>
     </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>	
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script>
 (function(){
             var element = function(id){
@@ -83,12 +100,13 @@
 			var clearBtn = element('clear');
 			var login_as = element('whois');
 			var sendbutton = element ('sendButton');
-			
+            var askuser = element ('askuser');
+
 			login_as.innerHTML = 'Connected as: ' + username;
-            
+
             var senderimage = $( "#sillynm" );
             senderimage.val( username );
-			
+
             // Set default status
             var statusDefault = status.textContent;
 
@@ -127,20 +145,20 @@
 							var displaytext = data[x].text;
 							var imgplaceholder = '';
 							if (typedata == 'image'){
-							imgplaceholder = '<img src="http://23.92.53.187:4000/static/'+data[x].image+ '" width="300px" /><br/>';
-							displaytext = '<a target = "_blank" href="http://23.92.53.187:4000/static/'+data[x].image+ '">' + data[x].image + '</a>';
+							imgplaceholder = '<img src="http://23.92.53.187:4000/static/'+data[x].attachment.payload.url+ '" width="300px" /><br/>';
+							displaytext = '<a target = "_blank" href="http://23.92.53.187:4000/static/'+data[x].attachment.payload.url+ '">' + data[x].attachment.payload.url + '</a>';
 							}
-							
-							
+
+
                             var message = document.createElement('div');
                             message.setAttribute('class', '');
                             message.innerHTML = '<div class="'+div_class+'">'+imgplaceholder+'<span class="username">'+data[x].name+':</span>&nbsp;'+displaytext+'</div>';
                             messages.appendChild(message);
                             messages.insertBefore(message, messages.firstChild);
-							
-							
-							
-							
+
+
+
+
                         }
                     }
                 });
@@ -155,9 +173,9 @@
                         textarea.value = '';
                     }
                 });
-				
+
 				function checktype(){
-				
+
 				}
 
                 // Handle Input
@@ -167,8 +185,9 @@
                         socket.emit('input', {
                             name:username,
                             text:textarea.value,
-							
-							
+                            quick_replies: ''
+
+
                         });
                         sendbutton.className += " sending";
 						setTimeout(
@@ -178,14 +197,14 @@
                         event.preventDefault();
                     }
                 })
-				
+
 				sendbutton.addEventListener("click", function(event){
 					// Emit to server input
                         socket.emit('input', {
                             name:username,
                             text:textarea.value,
-							quick_replies: 'empty'
-							
+							              quick_replies: ''
+
                         });
 						sendbutton.className += " sending";
 						setTimeout(
@@ -195,30 +214,40 @@
 
                         event.preventDefault();
 				});
-				
-				//image type
+
+				//input image type
 				document.getElementById("file-input").onchange = function() {
-				
-				       var sillyn = $('#sillynm').val(); 
-						 
+
+				       var sillyn = $('#sillynm').val();
+
 						 $('#imagetyp').ajaxSubmit({
 						   data: {username: sillyn},
 						   contentType: 'application/json',
 						   success: function(response){
-							    console.log ('ok');	
-                                							
+							    console.log ('ok');
+
 						   }
 					   });
                 };
-				
-                		
-				
-
                 
+                askuser.addEventListener("click", function(event){
+                    // Emit to server input
+                       console.log('quickreplies');
+                        socket.emit('quickreplies', {
+                            name:username,
+                        });
+                        
+                        event.preventDefault();
+                });
+
+
+
+
+
                 // Handle Chat Clear
                 clearBtn.addEventListener('click', function(){
                     socket.emit('clear');
-					
+
                 });
 
                 // Clear Message
@@ -228,6 +257,19 @@
             }
 
         })();
-</script>	
+</script>
+<script type="text/javascript">
+    $(function(){
+        $('#btnpopup_chat').click(function(e) {
+            e.preventDefault();
+            $('.popup_chat').toggle();
+        });
+        $('.overlay').click(function(e){
+            e.preventDefault();
+            $('.popup_chat').hide();
+        });
+    });
+</script>
 </body>
 </html>
+

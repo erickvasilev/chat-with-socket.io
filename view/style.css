@@ -156,18 +156,38 @@ User Input
 
 .image-upload img
 {
-    width: 80px;
+    /*width: 80px;*/
     cursor: pointer;
 }
+.ring{
+    height: 42px;
+    width: 42px;
+    background: transparent;
+    border-radius: 50%;
+    display: inline-block;
+}
 
-#quickreply {
-	position: absolute;
+#shirtcon {
+    width:80px
+    
+}
+
+small {
+    font-size:10px;
+}
+#quickreply, #sendimg , #sendlocation{
+	/*position: absolute;
     bottom: 6px;
     right: 80px;
-	width: 3.6%;
-	z-index: 1;
+	width: 3.4%;
+	z-index: 1;*/
+    width: 42px;
+    height: 42px;
 	cursor: pointer;
 }
+
+
+
 form.chat-input input[type="text"] {
     width: 80%;
     color: rgba(32,40,70,0.9);
@@ -208,4 +228,90 @@ form.chat-input input[type="submit"].sent-indicator {
 }
 form.chat-input input[type="submit"].sending {
     animation: send-indicator 0.9s ease-out 0s;
+}
+.popup_chat{
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.11);
+    margin-left: 15px;
+
+    border-radius: 4px;
+    width: 97%;
+}
+.overlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+}
+.content{
+    position: relative;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    padding: 0px 0px;
+}
+
+.list_menu_chat {
+    padding: 0px;
+    list-style: none;
+    list-style-type: none;
+}
+.list_menu_chat li a span {
+    border: 1px solid;
+    border-radius: 50px;
+    display: list-item;
+    font-size: 19px;
+    height: 40px;
+    line-height: 36px;
+    margin: auto;
+    text-align: center;
+    background:#000;
+    width: 40px;
+}
+
+.list_menu_chat li {
+    float: left;
+    text-align: center;
+    width: 33.33333%;
+}
+.list_menu_chat li a {
+    border-radius: 7px;
+    transition: all 0.3s ease-in-out 0s;
+	text-decoration: none;
+	color: black;
+}
+
+.chat_fs {
+	position: absolute;
+	bottom: 3px;
+	right: 57px; 
+	z-index: 1;
+	
+}
+
+@media only screen and (max-width: 767px){
+    .popup_chat {
+        display: none;
+        position: absolute;
+        bottom: 70px;
+        box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.11);
+        margin-left: 9px;
+        border-radius: 4px;
+        width: 90%;
+    }
+}
+@media (max-width: 991px) and (min-width: 768px){
+    .popup_chat {
+        display: none;
+        position: absolute;
+        bottom: 70px;
+        box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.11);
+        margin-left: 9px;
+        border-radius: 4px;
+        width: 96%;
+    }
 }
