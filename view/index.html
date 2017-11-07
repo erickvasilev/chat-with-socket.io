@@ -136,7 +136,7 @@
 						    //find-whois
 							var whois = data[x].name;
 							var div_class = 'sent-message';
-							console.log (username);
+							
 							if (username == whois){
 							    div_class = 'sent-message me';
 							}
@@ -144,10 +144,18 @@
 							var typedata = data[x].type;
 							var displaytext = data[x].text;
 							var imgplaceholder = '';
+
 							if (typedata == 'image'){
 							imgplaceholder = '<img src="http://23.92.53.187:4000/static/'+data[x].attachment.payload.url+ '" width="300px" /><br/>';
 							displaytext = '<a target = "_blank" href="http://23.92.53.187:4000/static/'+data[x].attachment.payload.url+ '">' + data[x].attachment.payload.url + '</a>';
 							}
+
+                            if (typedata == 'quickreplies'){
+                            imgplaceholder = '<img src="'+data[x].quick_replies[0].image_url+ '" width="300px" /><br/>';
+                            displaytext = '<a target = "_blank" href="'+data[x].quick_replies[0].image_url+ '">' + data[x].quick_replies[0].title + '</a> <p>&nbsp;</p><button class="btnyes">Yes</button>&nbsp;<button class="btnyes">Show me more</button>';
+                            }
+
+
 
 
                             var message = document.createElement('div');
@@ -235,8 +243,9 @@
                        console.log('quickreplies');
                         socket.emit('quickreplies', {
                             name:username,
+
                         });
-                        
+                        $('.popup_chat').hide();
                         event.preventDefault();
                 });
 

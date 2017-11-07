@@ -109,6 +109,35 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
                 socket.emit('cleared');
             });
         });
+
+        socket.on('quickreplies', function(data) {
+            // send quick replies
+            let name = 'Automatic';
+            let quick_replies = [
+                                  {
+                                    "content_type":"text",
+                                    "title":"Do You Want This Item?",
+                                    "image_url":"http://i.ebayimg.com/00/s/NTE2WDUxNg==/z/WxYAAOSwY45UUMHG/$_32.JPG",
+                                    "payload":"DEVELOPER_DEFINED_PAYLOAD_FOR_PICKING_RED"
+                                  }
+                                ]
+            
+               chat.insert({
+                    type: 'quickreplies',
+                    name: name,
+                    quick_replies: quick_replies
+                }, function() {
+                    client.emit('output', [{ type:'quickreplies', name: name, quick_replies: quick_replies }]);
+
+                    // Send status object
+                    sendStatus({
+                        message: 'Message sent',
+                        clear: true
+                    });
+                });
+
+            
+        });
 		
 		app.post('/upload', function(req, res) {
 		var upload = multer({
@@ -128,13 +157,14 @@ mongo.connect('mongodb://127.0.0.1/mongochat', function(err, db) {
 										let type = 'image';
 										let name = req.body.username[0];
 									
-										let attachment = {
-"type":"image",
-"payload": {
-"url": filename
-}
-};
-										let quick_replies = req.body.quickreplies;
+										let attachment =   {
+                                                            "type":"image",
+                                                            "payload": {
+                                                                         "url": filename
+                                                                         }
+                                                            };
+
+										let quick_replies = req.body.quick_replies;
 
 										// Check for name and message
 										if (name == '' || attachment == '') {
